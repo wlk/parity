@@ -399,7 +399,7 @@ function run_installer()
   }
   function linux_rocksdb_installer()
   {
-    os_version=lsb_release -r | grep -m1 -oP '(Release:)([^\@])*' | awk '{print $2}'
+    os_version=$(lsb_release -r | grep -m1 -oP '(Release:)([^\@])*' | awk '{print $2}')
 
     if [[ $os_version == "14.04" ]]
     then
