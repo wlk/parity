@@ -434,12 +434,11 @@ function run_installer()
   function linux_installer()
   {
     # info "Installing dependencies"
-     sudo apt-get -f -y install
-    sudo apt-get update -qq && sudo apt-get install -q -y git curl g++ wget build-essential software-properties-common
+		sudo apt-get -f -y install
+		sudo apt-get update -qq && sudo apt-get install -q -y git curl g++ wget build-essential software-properties-common
     # echo
 
-    # os_version=$(lsb_release -r | grep -m1 -oP '(Release:)([^\@])*' | awk '{print $2}')
-
+    os_version=$(lsb_release -r | grep -m1 -oP '(Release:)([^\@])*' | awk '{print $2}')
 
     # info "Installing rocksdb"
     # linux_rocksdb_installer
