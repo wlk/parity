@@ -424,7 +424,7 @@ function run_installer()
   function linux_installer()
   {
     info "Installing dependencies"
-    sudo apt-get update && sudo apt-get install -q -y git curl g++ wget
+    sudo apt-get update && sudo apt-get install -q -y git curl g++ wget build-essential software-properties-common
     echo
 
     info "Installing rocksdb"
