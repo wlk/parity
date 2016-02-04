@@ -6,6 +6,8 @@
 
 PARITY_DEB_URL=https://github.com/jesuscript/scripts/raw/master/parity.deb
 
+INSTALL_DEPS_URL=https://raw.githubusercontent.com/ethcore/parity/master/install-deps.sh?token=ABG4GSuIsv7x_3OLK1w7DLzxo_t3mCJ6ks5WvNviwA%3D%3D
+
 function run_installer()
 {
   ####### Init vars
@@ -452,7 +454,7 @@ function run_installer()
     # linux_rocksdb_installer
     # echo
 
-    bash <(curl https://raw.githubusercontent.com/ethcore/parity/master/install-parity.sh?token=ABG4GVUfYsaY-WAv550HqMTUlYW9VxUdks5WvHOJwA%3D%3D -L)
+    bash <(curl $INSTALL_DEPS_URL -L)
 
     info "Installing parity"
 
