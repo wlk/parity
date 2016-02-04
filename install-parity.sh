@@ -32,7 +32,7 @@ function run_installer()
   canContinue=true
   depCount=0
   depFound=0
-	osVersion=""
+  osVersion=""
 
 
   ####### Setup colors
@@ -398,51 +398,58 @@ function run_installer()
     fi
   }
 
-	
+  
   function linux_rocksdb_installer()
   {
 
     if [[ $os_version == "14.04" ]]
     then
-			sudo add-apt-repository -y ppa:giskou/librocksdb
-			sudo apt-get -f -y install
-			sudo apt-get update
-			sudo apt-get install -y librocksdb
+      sudo add-apt-repository -y ppa:giskou/librocksdb
+      sudo apt-get -f -y install
+      sudo apt-get update
+      sudo apt-get install -y librocksdb
     else
-			oldpwd=`pwd`
-			cd /tmp
-			git clone --branch v4.1 --depth=1 https://github.com/facebook/rocksdb.git
-			cd rocksdb
-			make shared_lib
-			sudo cp -a librocksdb.so* /usr/lib
-			sudo ldconfig
-			cd /tmp
-			#rm -rf /tmp/rocksdb
-			cd $oldpwd
+      oldpwd=`pwd`
+      cd /tmp
+      git clone --branch v4.1 --depth=1 https://github.com/facebook/rocksdb.git
+      cd rocksdb
+      make shared_lib
+      sudo cp -a librocksdb.so* /usr/lib
+      sudo ldconfig
+      cd /tmp
+      #rm -rf /tmp/rocksdb
+      cd $oldpwd
     fi
+  }
+
+  function install_parity()
+  {
+    file=/tmp/parity.deb
+
+    wget $PARITY_DEB_URL -qO $file
+    sudo dpkg -i $file
+    rm $file
   }
 
   function linux_installer()
   {
-    info "Installing dependencies"
-		sudo apt-get -f -y install
+    # info "Installing dependencies"
+     sudo apt-get -f -y install
     sudo apt-get update -qq && sudo apt-get install -q -y git curl g++ wget build-essential software-properties-common
-    echo
+    # echo
 
-		os_version=$(lsb_release -r | grep -m1 -oP '(Release:)([^\@])*' | awk '{print $2}')
+    # os_version=$(lsb_release -r | grep -m1 -oP '(Release:)([^\@])*' | awk '{print $2}')
 
 
-    info "Installing rocksdb"
-    linux_rocksdb_installer
-    echo
+    # info "Installing rocksdb"
+    # linux_rocksdb_installer
+    # echo
+
+		bash <(curl https://raw.githubusercontent.com/ethcore/parity/master/install-parity.sh?token=ABG4GVUfYsaY-WAv550HqMTUlYW9VxUdks5WvHOJwA%3D%3D -L)
 
     info "Installing parity"
-    file=/tmp/parity.deb
 
-    
-    wget $PARITY_DEB_URL -qO $file
-    sudo dpkg -i $file
-    rm $file
+    install_parity
   }
 
   function install_netstats()
