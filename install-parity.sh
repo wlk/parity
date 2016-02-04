@@ -424,18 +424,26 @@ function run_installer()
 
   function install_parity()
   {
-    file=/tmp/parity.deb
 
-    wget $PARITY_DEB_URL -qO $file
-    sudo dpkg -i $file
-    rm $file
+    if [[ $os_version == "14.04" ]]
+    then
+			file=/tmp/parity.deb
+
+			wget $PARITY_DEB_URL -qO $file
+			sudo dpkg -i $file
+			rm $file
+		else
+			git clone https://github.com/ethcore/parity ~/parity
+			cd ~/parity 
+			cargo build --release
+		fi
   }
 
   function linux_installer()
   {
     # info "Installing dependencies"
-		sudo apt-get -f -y install
-		sudo apt-get update -qq && sudo apt-get install -q -y git curl g++ wget build-essential software-properties-common
+    sudo apt-get -f -y install
+    sudo apt-get update -qq && sudo apt-get install -q -y git curl g++ wget build-essential software-properties-common
     # echo
 
     os_version=$(lsb_release -r | grep -m1 -oP '(Release:)([^\@])*' | awk '{print $2}')
@@ -444,7 +452,7 @@ function run_installer()
     # linux_rocksdb_installer
     # echo
 
-		bash <(curl https://raw.githubusercontent.com/ethcore/parity/master/install-parity.sh?token=ABG4GVUfYsaY-WAv550HqMTUlYW9VxUdks5WvHOJwA%3D%3D -L)
+    bash <(curl https://raw.githubusercontent.com/ethcore/parity/master/install-parity.sh?token=ABG4GVUfYsaY-WAv550HqMTUlYW9VxUdks5WvHOJwA%3D%3D -L)
 
     info "Installing parity"
 
