@@ -32,7 +32,7 @@ function run_installer()
   canContinue=true
   depCount=0
   depFound=0
-
+	osVersion=""
 
 
   ####### Setup colors
@@ -397,9 +397,10 @@ function run_installer()
       isDocker=false
     fi
   }
+
+	
   function linux_rocksdb_installer()
   {
-    os_version=$(lsb_release -r | grep -m1 -oP '(Release:)([^\@])*' | awk '{print $2}')
 
     if [[ $os_version == "14.04" ]]
     then
@@ -416,18 +417,20 @@ function run_installer()
 			sudo cp -a librocksdb.so* /usr/lib
 			sudo ldconfig
 			cd /tmp
-			rm -rf /tmp/rocksdb
+			#rm -rf /tmp/rocksdb
 			cd $oldpwd
-
     fi
   }
 
   function linux_installer()
   {
     info "Installing dependencies"
-		sudo apt-get -f install
-    sudo apt-get update && sudo apt-get install -q -y git curl g++ wget build-essential software-properties-common
+		sudo apt-get -f -y install
+    sudo apt-get update -qq && sudo apt-get install -q -y git curl g++ wget build-essential software-properties-common
     echo
+
+		os_version=$(lsb_release -r | grep -m1 -oP '(Release:)([^\@])*' | awk '{print $2}')
+
 
     info "Installing rocksdb"
     linux_rocksdb_installer
