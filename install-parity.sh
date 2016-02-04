@@ -401,7 +401,7 @@ function run_installer()
   {
     os_version=lsb_release -r | grep -m1 -oP '(Release:)([^\@])*' | awk '{print $2}'
 
-    if [[ $os_version == "14.04"]]
+    if [[ $os_version == "14.04" ]]
     then
 			sudo add-apt-repository -y ppa:giskou/librocksdb
 			sudo apt-get -f -y install
