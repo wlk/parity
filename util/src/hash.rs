@@ -70,12 +70,17 @@ pub struct Secured<Hash: FixedHash> {
 }
 
 impl<Hash: FixedHash> Drop for Secured<Hash> {
-	fn drop(&mut self) { self.hash.clone_from_slice(Hash::random().as_slice()); }
+	fn drop(&mut self) {
+		unsafe { ::std::intrinsics::volatile_set_memory(&mut self.hash, 0, ::std::mem::size_of::<Hash>()); }
+	}
 }
+
 
 impl<Hash: FixedHash> From<Hash> for Secured<Hash> {
 	fn from(hash: Hash) -> Self {
-		Secured { hash: hash }
+		Secured {
+			hash: hash
+		}
 	}
 }
 
