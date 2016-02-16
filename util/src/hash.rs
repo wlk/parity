@@ -653,7 +653,6 @@ impl_hash!(H512, 64);
 impl_hash!(H520, 65);
 impl_hash!(H1024, 128);
 impl_hash!(H2048, 256);
-impl_hash!(SecureH256, 32);
 
 /// Constant address for point 0. Often used as a default.
 pub static ZERO_ADDRESS: Address = Address([0x00; 20]);
