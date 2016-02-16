@@ -71,7 +71,7 @@ pub struct Secured<Hash: FixedHash> {
 
 impl<Hash: FixedHash> Drop for Secured<Hash> {
 	fn drop(&mut self) {
-		unsafe { ::std::intrinsics::volatile_set_memory(&mut self.hash, 0, ::std::mem::size_of::<Hash>()); }
+		unsafe { ::std::intrinsics::volatile_set_memory(&mut *self, 0, ::std::mem::size_of::<Hash>()); }
 	}
 }
 
