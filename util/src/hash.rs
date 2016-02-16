@@ -764,18 +764,16 @@ mod tests {
 	#[test]
 	fn secured_leaves_entropy() {
 		let view = {
-			let secure = Secured::<H256>::from(H256::zero());
+			let secure = Secured::<H256>::from(H256::random());
 			&secure as *const _ as *const u8
 		};
 		let mut summ = 0;
 		for i in 0..::std::mem::size_of::<H256>() {
 			summ = summ + unsafe {*view.offset(i as isize)};
 			if summ > 0 {
-				break;
+				panic!("non-zero byte in memory that is supposed to be all-zeroed");
 			}
 		}
-
-		assert!(summ != 0);
 	}
 }
 
