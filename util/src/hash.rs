@@ -63,6 +63,29 @@ pub trait FixedHash: Sized + BytesConvertable + Populatable + FromStr + Default 
 	fn low_u64(&self) -> u64;
 }
 
+/// Secured extension of `FixedHash`
+/// when moved, fills memory it left with random bytes
+pub struct Secured<Hash: FixedHash> {
+	hash: Hash
+}
+
+impl<Hash: FixedHash> Drop for Secured<Hash> {
+	fn drop(&mut self) { self.hash.clone_from_slice(Hash::random().as_slice()); }
+}
+
+impl<Hash: FixedHash> From<Hash> for Secured<Hash> {
+	fn from(hash: Hash) -> Self {
+		Secured { hash: hash }
+	}
+}
+
+impl<Hash: FixedHash> Deref for Secured<Hash> {
+	type Target = Hash;
+	fn deref(&self) -> &Hash {
+		&self.hash
+	}
+}
+
 fn clean_0x(s: &str) -> &str {
 	if s.len() >= 2 && &s[0..2] == "0x" {
 		&s[2..]
@@ -234,7 +257,7 @@ macro_rules! impl_hash {
 		}
 
 		impl serde::Serialize for $from {
-			fn serialize<S>(&self, serializer: &mut S) -> Result<(), S::Error> 
+			fn serialize<S>(&self, serializer: &mut S) -> Result<(), S::Error>
 			where S: serde::Serializer {
 				let mut hex = "0x".to_owned();
 				hex.push_str(self.to_hex().as_ref());
@@ -249,7 +272,7 @@ macro_rules! impl_hash {
 
 				impl serde::de::Visitor for HashVisitor {
 					type Value = $from;
-					
+
 					fn visit_str<E>(&mut self, value: &str) -> Result<Self::Value, E> where E: serde::Error {
 						// 0x + len
 						if value.len() != 2 + $size * 2 {
@@ -630,6 +653,7 @@ impl_hash!(H512, 64);
 impl_hash!(H520, 65);
 impl_hash!(H1024, 128);
 impl_hash!(H2048, 256);
+impl_hash!(SecureH256, 32);
 
 /// Constant address for point 0. Often used as a default.
 pub static ZERO_ADDRESS: Address = Address([0x00; 20]);
@@ -725,6 +749,29 @@ mod tests {
 		assert_eq!(r_ref, u);
 		let r: U256 = From::from(h);
 		assert_eq!(r, u);
+	}
+
+	#[test]
+	fn secured_from_h256() {
+		let sec = Secured::<H256>::from(H256::zero());
+		assert_eq!(*sec, H256::zero());
+	}
+
+	#[test]
+	fn secured_leaves_entropy() {
+		let view = {
+			let secure = Secured::<H256>::from(H256::zero());
+			&secure as *const _ as *const u8
+		};
+		let mut summ = 0;
+		for i in 0..::std::mem::size_of::<H256>() {
+			summ = summ + unsafe {*view.offset(i as isize)};
+			if summ > 0 {
+				break;
+			}
+		}
+
+		assert!(summ != 0);
 	}
 }
 

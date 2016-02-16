@@ -30,6 +30,7 @@
 #![allow(match_same_arms)]
 // Keeps consistency (all lines with `.clone()`) and helpful when changing ref to non-ref.
 #![allow(clone_on_copy)]
+#![feature(associated_type_defaults)]
 
 //! Ethcore-util library
 //!
