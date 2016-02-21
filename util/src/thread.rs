@@ -16,7 +16,7 @@
 
 //! Thread management helpers
 
-use libc::{c_int, pthread_self, pthread_t};
+use libc::{c_int, c_long, pthread_self, pthread_t, syscall};
 
 #[repr(C)]
 struct sched_param {
@@ -40,4 +40,14 @@ pub fn lower_thread_priority() {
 		trace!("Could not decrease thread piority");
 	}
 	//unsafe { setpriority(PRIO_DARWIN_THREAD, 0, PRIO_DARWIN_BG); }
+}
+
+#[cfg(target_os="linux")]
+pub fn lower_thread_priority() {
+	const PRIO_PROCESS: c_int = 0;
+	const SYS_gettid: c_long = 186;
+	unsafe { 
+		let tid = syscall(SYS_gettid);
+		setpriority(PRIO_PROCESS, 0, 19); 
+	}
 }
