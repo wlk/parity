@@ -59,10 +59,12 @@ pub fn verify_block_basic(header: &Header, bytes: &[u8], engine: &Engine) -> Res
 pub fn verify_block_unordered(header: Header, bytes: Bytes, engine: &Engine) -> Result<PreVerifiedBlock, Error> {
 	// Verify transactions. 
 	let mut transactions = Vec::new();
-	let v = BlockView::new(&bytes);
-	for t in v.transactions() {
-		try!(engine.verify_transaction(&t, &header));
-		transactions.push(t);
+	{
+		let v = BlockView::new(&bytes);
+		for t in v.transactions() {
+			try!(engine.verify_transaction(&t, &header));
+			transactions.push(t);
+		}
 	}
 	Ok(PreVerifiedBlock {
 		header: header,
