@@ -264,11 +264,9 @@ impl BlockQueue {
 	pub fn import_block(&self, bytes: Bytes) -> ImportResult {
 		let header = BlockView::new(&bytes).header();
 		let h = header.hash();
-		{
-			if self.processing.read().unwrap().contains(&h) {
-				return Err(ImportError::AlreadyQueued);
-			}
-			}
+		if self.processing.read().unwrap().contains(&h) {
+			return Err(ImportError::AlreadyQueued);
+		}
 		{
 			let mut bad = self.verification.bad.lock().unwrap();
 			if bad.contains(&h) {
@@ -392,7 +390,7 @@ mod tests {
 
 	#[test]
 	fn can_import_blocks() {
-		let mut queue = get_test_queue();
+		let queue = get_test_queue();
 		if let Err(e) = queue.import_block(get_good_dummy_block()) {
 			panic!("error importing block that is valid by definition({:?})", e);
 		}
@@ -400,7 +398,7 @@ mod tests {
 
 	#[test]
 	fn returns_error_for_duplicates() {
-		let mut queue = get_test_queue();
+		let queue = get_test_queue();
 		if let Err(e) = queue.import_block(get_good_dummy_block()) {
 			panic!("error importing block that is valid by definition({:?})", e);
 		}
@@ -419,7 +417,7 @@ mod tests {
 
 	#[test]
 	fn returns_ok_for_drained_duplicates() {
-		let mut queue = get_test_queue();
+		let queue = get_test_queue();
 		let block = get_good_dummy_block();
 		let hash = BlockView::new(&block).header().hash().clone();
 		if let Err(e) = queue.import_block(block) {
@@ -436,7 +434,7 @@ mod tests {
 
 	#[test]
 	fn returns_empty_once_finished() {
-		let mut queue = get_test_queue();
+		let queue = get_test_queue();
 		queue.import_block(get_good_dummy_block()).expect("error importing block that is valid by definition");
 		queue.flush();
 		queue.drain(1);
