@@ -99,6 +99,7 @@ impl QueueSignal {
 }
 
 struct Verification {
+	// All locks must be captured in the order declared here.
 	unverified: Mutex<VecDeque<UnVerifiedBlock>>,
 	verified: Mutex<VecDeque<PreVerifiedBlock>>,
 	verifying: Mutex<VecDeque<VerifyingBlock>>,
@@ -137,7 +138,6 @@ impl BlockQueue {
 				.name(format!("Verifier #{}", i))
 				.spawn(move || {
 					panic_handler.catch_panic(move || {
-						lower_thread_priority();
 						BlockQueue::verify(verification, engine, more_to_verify, ready_signal, deleting, empty)
 					}).unwrap()
 				})

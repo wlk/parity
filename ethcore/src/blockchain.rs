@@ -148,6 +148,7 @@ struct CacheManager {
 ///
 /// **Does not do input data verification.**
 pub struct BlockChain {
+	// All locks must be captured in the order declared here.
 	pref_cache_size: AtomicUsize,
 	max_cache_size: AtomicUsize,
 
@@ -167,6 +168,7 @@ pub struct BlockChain {
 	blocks_db: DB,
 
 	cache_man: RwLock<CacheManager>,
+	insert_lock: Mutex<()>
 }
 
 impl BlockProvider for BlockChain {
@@ -274,6 +276,7 @@ impl BlockChain {
 			extras_db: extras_db,
 			blocks_db: blocks_db,
 			cache_man: RwLock::new(cache_man),
+			insert_lock: Mutex::new(()),
 		};
 
 		// load best block
@@ -436,6 +439,7 @@ impl BlockChain {
 			return;
 		}
 
+		let _lock = self.insert_lock.lock();
 		// store block in db
 		self.blocks_db.put(&hash, &bytes).unwrap();
 		let (batch, new_best, details) = self.block_to_extras_insert_batch(bytes);
